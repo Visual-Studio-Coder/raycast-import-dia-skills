@@ -6,6 +6,18 @@
   "icon": "extension-icon.png",
   "author": "Visual-Studio-Coder",
   "license": "MIT",
+  "keywords": [
+    "raycast",
+    "dia",
+    "skills",
+    "llm",
+    "import",
+    "browser",
+    "ai",
+    "command",
+    "skill",
+    "arc browser"
+  ],
   "commands": [
     {
       "name": "import-dia-skill",

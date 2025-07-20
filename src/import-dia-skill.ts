@@ -30,7 +30,7 @@ export default async function Command(props: { arguments: Arguments }) {
     });
     return;
   }
-  
+
   if (!skillUrl.startsWith("https://www.diabrowser.com/skills/")) {
     await showToast({
       style: Toast.Style.Failure,
@@ -55,7 +55,7 @@ export default async function Command(props: { arguments: Arguments }) {
       // Try title tag and remove site name
       const titleText = extractWithRegex(html, /<title>([^<]+)<\/title>/);
       if (titleText) {
-        shortcutName = titleText.split(' | ')[0].trim();
+        shortcutName = titleText.split(" | ")[0].trim();
       }
     }
     if (!shortcutName) {
@@ -69,24 +69,26 @@ export default async function Command(props: { arguments: Arguments }) {
 
     // Extract prompt - get everything from the rich text content area
     let promptText = "";
-    
+
     // Look for the rich text div that contains the prompt
-    const richTextMatch = html.match(/<div class="bg-fill-tertiary rounded-8 p-12"><div class="rich-text[^"]*"[^>]*>([\s\S]*?)<\/div><\/div>/);
+    const richTextMatch = html.match(
+      /<div class="bg-fill-tertiary rounded-8 p-12"><div class="rich-text[^"]*"[^>]*>([\s\S]*?)<\/div><\/div>/,
+    );
     if (richTextMatch && richTextMatch[1]) {
       // Extract text content from the HTML, removing tags but preserving structure
       promptText = richTextMatch[1]
-        .replace(/<\/p>/g, '\n\n')  // Convert paragraph breaks to line breaks
-        .replace(/<\/li>/g, '\n')   // Convert list items to line breaks
-        .replace(/<[^>]*>/g, '')    // Remove all HTML tags
-        .replace(/&lt;/g, '<')      // Decode HTML entities
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&')
+        .replace(/<\/p>/g, "\n\n") // Convert paragraph breaks to line breaks
+        .replace(/<\/li>/g, "\n") // Convert list items to line breaks
+        .replace(/<[^>]*>/g, "") // Remove all HTML tags
+        .replace(/&lt;/g, "<") // Decode HTML entities
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
         .replace(/&quot;/g, '"')
         .replace(/&#x27;/g, "'")
-        .replace(/\n\s*\n\s*\n/g, '\n\n')  // Clean up multiple line breaks
+        .replace(/\n\s*\n\s*\n/g, "\n\n") // Clean up multiple line breaks
         .trim();
     }
-    
+
     if (!promptText) {
       // Fallback to textarea or other patterns
       promptText = extractWithRegex(html, /<textarea[^>]*>([\s\S]*?)<\/textarea>/);
@@ -103,20 +105,21 @@ export default async function Command(props: { arguments: Arguments }) {
     }
 
     // Add the browser instruction prefix to the prompt
-    promptText = "@browser find relevant tabs and get their content (only if necessary) for the following:\n\n" + promptText;
+    promptText =
+      "@browser find relevant tabs and get their content (only if necessary) for the following:\n\n" + promptText;
 
     // Clean up the prompt text - decode HTML entities and normalize whitespace
     promptText = promptText
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
       .replace(/&quot;/g, '"')
       .replace(/&#x27;/g, "'")
       .trim();
 
     // Construct the ray.so URL
     const preferences = getPreferenceValues<Record<string, string>>();
-    
+
     const raySoData: RaySoPrompt = {
       title: shortcutName,
       prompt: promptText,
@@ -136,7 +139,7 @@ export default async function Command(props: { arguments: Arguments }) {
       title: "Successfully Imported Skill",
       message: `Opened "${shortcutName}" in ray.so`,
     });
-    
+
     await closeMainWindow();
     await popToRoot();
   } catch (error) {
